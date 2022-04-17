@@ -23,7 +23,7 @@
         </div>
         <div class="row">
             <div class="column">
-                <form>
+                <form id="problemForm">
                     <div class="mb-3">
                         <select id="problemType" class="form-select w-auto">
                             <option selected>Problem type</option>
@@ -38,8 +38,21 @@
                     </div>
                     <div class="mb-3">
                         <label for="questionText" class="form-label">Question</label>
-                        <textarea class="form-control" id="questionText" rows="7"></textarea>
+                        <textarea class="form-control" id="questionText" rows="5"></textarea>
                     </div>
+                    <div class="mb-3">
+                        <label for="commentText" class="form-label">Comment</label>
+                        <textarea class="form-control" id="commentText" rows="5"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="answerText" class="form-label">Answer</label>
+                        <input type="text" class="form-control" id="answerText">
+                    </div>
+                    <div class="mb-3">
+                        <label for="solutionText" class="form-label">Solution</label>
+                        <textarea class="form-control" id="solutionText" rows="5"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>
