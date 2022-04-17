@@ -36,15 +36,17 @@ function insertText(btn) {
 }
 
 const buttonList = [
-    new EditorButton("\\frac{", "}{}", "frac"),
-    new EditorButton("$", "$", "$$"),
-    new EditorButton("^{", "}", "^"),
-    new EditorButton("_{", "}", "_"),
-    new EditorButton("\\cdot", "", "•"),
-    new EditorButton("\\times", "", "⨯"),
-    new EditorButton("^{\circ}", "", "°"),
-    new EditorButton("\\sqrt{", "}", "√x")
-];
+    ["\\frac{", "}{}", "frac"],
+    ["$", "$", "$$"],
+    ["^{", "}", "^"],
+    ["_{", "}", "_"],
+    ["\\cdot", "", "•"],
+    ["\\times", "", "⨯"],
+    ["^{\\circ}", "", "°"],
+    ["\\sqrt{", "}", "√x"],
+    ["\\approx", "", "≈"],
+    ["\\equiv", "", "≡"]
+].map(x => new EditorButton(...x));
 
 function buildEditor(par) {
     for (const btn of buttonList) {
