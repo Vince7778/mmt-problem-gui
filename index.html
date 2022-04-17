@@ -52,15 +52,16 @@
                         <label for="solutionText" class="form-label">Solution</label>
                         <textarea class="form-control font-monospace" id="solutionText" rows="5"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="btn btn-primary">Compile</button>
                 </form>
             </div>
         </div>
         <div class="row mb-3">
             <div class="column">
                 <div class="mb-3 d-none" id="errors"></div>
-                <div class="font-monospace" id="compiledOutput">
-
+                <div class="d-none" id="outputSpace">
+                    <button id="copyButton" class="btn btn-success">Copy</button>
+                    <div class="font-monospace border rounded bg-light p-2 mt-1" id="compiledOutput"></div>
                 </div>
             </div>
         </div>

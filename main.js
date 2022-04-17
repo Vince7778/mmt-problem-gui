@@ -1,4 +1,6 @@
 
+let lastOutput = "";
+
 // Severities: "err", "warn", "info"
 function showError(str, sev) {
     let sevClass, errTypeText;
@@ -34,7 +36,18 @@ function clearErrors() {
 }
 
 function showResult(str) {
+    lastOutput = str;
     document.getElementById("compiledOutput").innerText = str;
+    document.getElementById("outputSpace").classList.remove("d-none");
+}
+
+document.getElementById("copyButton").addEventListener("click", ev => {
+    navigator.clipboard.writeText(lastOutput);
+});
+
+function resetDisplays() {
+    document.getElementById("outputSpace").classList.add("d-none");
+    clearErrors();
 }
 
 const formElement = document.getElementById("problemForm");
@@ -49,13 +62,93 @@ function getFormValues() {
     };
 }
 
-function checkLatex(str, field) {
-    // implement later
-    return {
-        valid: false,
-        error: "Test error",
-        sev: "err"
+// needs to open with c1 and close with c2
+// returns 0 if no mismatch, 1 if left open, -1 if premature close
+function checkMismatch(str, c1, c2, ignoreBackslash) {
+    let depth = 0, skip = false, lastC1 = 0;
+    for (let i = 0; i < str.length; i++) {
+        if (skip) {
+            skip = false;
+            continue;
+        }
+
+        if (str[i] === '\\' && ignoreBackslash) {
+            skip = true;
+        } else if (str[i] === c2) {
+            depth--;
+        } else if (str[i] === c1) {
+            depth++;
+            lastC1 = i;
+        }
+
+        if (depth < 0) {
+            return {
+                err: -1,
+                ind: i
+            };
+        }
     }
+
+
+    return {
+        err: depth > 0 ? 1 : 0,
+        ind: depth > 0 ? lastC1 : -1,
+    }
+}
+
+function checkLatex(str, field) {
+    let errorList = [];
+
+    // check mismatching $
+    const dollarCount = (str.match(/[^\\](?=\$)/gm) || []).length;
+    if (dollarCount % 2 === 1) {
+        errorList.push({
+            valid: false,
+            error: "Mismatching $ signs",
+            sev: "err"
+        });
+    }
+
+    // check between $$
+    const dollarList = str.match(/[^$]*(\$|.$)/gm) || [];
+    console.log(dollarList);
+    let curInd = 0; // current index in actual string
+    let curLine = 1;
+    let inDollars = false;
+    for (const istr of dollarList) {
+        // check mismatching brackets
+        const bracketList = [
+            ['{', '}', "err"],
+            ['[', ']', "err"],
+            ['(', ')', "warn"]
+        ];
+        for (const [c1, c2, sev] of bracketList) {
+            const res = checkMismatch(istr, c1, c2, true);
+            if (res.err !== 0) {
+                let retErr = {
+                    valid: false,
+                    error: "",
+                    sev: sev
+                }
+                if (res.err === 1) {
+                    const linesBetween = (istr.substring(0, res.ind).match(/\n/g) || []).length;
+                    const subStr = str.substring(curInd+res.ind-5, curInd+res.ind+6);
+                    retErr.error = `Mismatched ${c1} around "${subStr}" (line ${curLine+linesBetween})`;
+                } else if (res.err === -1) {
+                    const linesBetween = (istr.substring(0, res.ind).match(/\n/g) || []).length;
+                    const subStr = str.substring(curInd+res.ind-10, curInd+res.ind);
+                    retErr.error = `Mismatched ${c2} after "${subStr}" (line ${curLine+linesBetween})`;
+                }
+                errorList.push(retErr);
+            }
+        }
+
+        curInd += istr.length;
+        curLine += (istr.match("\n") || []).length;
+        inDollars = !inDollars;
+    }
+
+    return errorList;
 }
 
 function compileTemplate(vals) {
@@ -67,8 +160,8 @@ function compileTemplate(vals) {
 
     // check latex of all fields
     for (const field of ["question", "comment", "answer", "solution"]) {
-        const resp = checkLatex(vals[field], field);
-        if (!resp.valid) {
+        const respList = checkLatex(vals[field], field);
+        for (const resp of respList) {
             showError(`In ${field}: ${resp.error}`, resp.sev);
             if (resp.sev === "err") failed = true;
         }
@@ -103,6 +196,7 @@ ${vals.solution}
 formElement.addEventListener("submit", ev => {
     ev.preventDefault();
 
+    resetDisplays();
     const vals = getFormValues();
     compileTemplate(vals);
 });
