@@ -21,12 +21,12 @@
                 <small class="text-muted">By Conor Kennedy</small>
             </div>
         </div>
-        <div class="row">
+        <div class="row mb-3">
             <div class="column">
                 <form id="problemForm">
                     <div class="mb-3">
                         <select id="problemType" class="form-select w-auto">
-                            <option selected>Problem type</option>
+                            <option selected value="">Problem type</option>
                             <option value="Alg">Algebra</option>
                             <option value="Combo">Combo</option>
                             <option value="Est">Estimation</option>
@@ -38,22 +38,29 @@
                     </div>
                     <div class="mb-3">
                         <label for="questionText" class="form-label">Question</label>
-                        <textarea class="form-control" id="questionText" rows="5"></textarea>
+                        <textarea class="form-control font-monospace" id="questionText" rows="5"></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="commentText" class="form-label">Comment</label>
-                        <textarea class="form-control" id="commentText" rows="5"></textarea>
+                        <textarea class="form-control font-monospace" id="commentText" rows="5"></textarea>
                     </div>
                     <div class="mb-3">
                         <label for="answerText" class="form-label">Answer</label>
-                        <input type="text" class="form-control" id="answerText">
+                        <input type="text" class="form-control font-monospace" id="answerText">
                     </div>
                     <div class="mb-3">
                         <label for="solutionText" class="form-label">Solution</label>
-                        <textarea class="form-control" id="solutionText" rows="5"></textarea>
+                        <textarea class="form-control font-monospace" id="solutionText" rows="5"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="column">
+                <div class="font-monospace" id="compiledOutput">
+
+                </div>
             </div>
         </div>
     </div>

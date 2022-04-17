@@ -4,7 +4,7 @@ function showError(str) {
 }
 
 function showResult(str) {
-    // TODO: implement
+    document.getElementById("compiledOutput").innerText = str;
 }
 
 const formElement = document.getElementById("problemForm");
@@ -27,6 +27,11 @@ function checkLatex(str, field) {
 }
 
 function compileTemplate(vals) {
+    if (vals.type === "") {
+        showError("Please choose a problem type");
+        return false;
+    }
+
     // check latex of all fields
     for (const field of ["question", "comment", "answer", "solution"]) {
         const resp = checkLatex(vals[field], field);
@@ -37,31 +42,33 @@ function compileTemplate(vals) {
     }
 
     const template = `\
-\input{../other/problem-preamble.tex}
-\ques[${vals.type}]
-\begin{question}
+\\input{../other/problem-preamble.tex}
+\\ques[${vals.type}]
+\\begin{question}
 ${vals.question}
-\end{question}
+\\end{question}
 
-\begin{comment}
+\\begin{comment}
 ${vals.comment}
-\end{comment}
+\\end{comment}
 
-\begin{answer}
+\\begin{answer}
 ${vals.answer}
-\end{answer}
+\\end{answer}
 
-\begin{solution}
+\\begin{solution}
 ${vals.solution}
-\end{solution}
+\\end{solution}
 
-\problemend`;
+\\problemend`;
 
     showResult(template);
+    return true;
 }
 
 formElement.addEventListener("submit", ev => {
     ev.preventDefault();
 
     const vals = getFormValues();
+    compileTemplate(vals);
 });
