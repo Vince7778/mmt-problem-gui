@@ -89,7 +89,6 @@ function checkMismatch(str, c1, c2, ignoreBackslash) {
         }
     }
 
-
     return {
         err: depth > 0 ? 1 : 0,
         ind: depth > 0 ? lastC1 : -1,
@@ -100,13 +99,30 @@ function checkLatex(str, field) {
     let errorList = [];
 
     // check mismatching $
-    const dollarCount = (str.match(/[^\\](?=\$)/gm) || []).length;
+    let dollarCount = 0, skip = false;
+    for (let i = 0; i < str.length; i++) {
+        if (skip) {
+            skip = false;
+            continue;
+        }
+        if (str[i] === '\\') skip = true;
+        else if (str[i] === '$') dollarCount++;
+    }
     if (dollarCount % 2 === 1) {
         errorList.push({
-            valid: false,
             error: "Mismatching $ signs",
             sev: "err"
         });
+    }
+
+    // check for \ans in solution
+    if (field === "solution" && str !== "") {
+        if (!str.match("\\ans")) {
+            errorList.push({
+                error: "Missing \\ans in solution",
+                sev: "err"
+            })
+        }
     }
 
     // check between $$
@@ -126,7 +142,6 @@ function checkLatex(str, field) {
             const res = checkMismatch(istr, c1, c2, true);
             if (res.err !== 0) {
                 let retErr = {
-                    valid: false,
                     error: "",
                     sev: sev
                 }
@@ -140,6 +155,17 @@ function checkLatex(str, field) {
                     retErr.error = `Mismatched ${c2} after "${subStr}" (line ${curLine+linesBetween})`;
                 }
                 errorList.push(retErr);
+            }
+        }
+
+        // check control sequences
+        if (!inDollars) {
+            const controlMatch = istr.match(/\\\w+/g) || [];
+            for (const cc of controlMatch) {
+                errorList.push({
+                    error: `Control sequence ${cc} is outside of $$. Make sure this is intentional!`,
+                    sev: "info"
+                });
             }
         }
 
