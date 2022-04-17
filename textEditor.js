@@ -12,12 +12,35 @@ class EditorButton {
 
     createElement() {
         const btn = document.createElement("button");
-        btn.classList.add("btn", `btn-${this.colorClass}`, "mt-2", "me-1", "d-inline");
+        btn.classList.add("btn", `btn-${this.colorClass}`, "me-1", "d-inline");
         btn.type = "button";
         btn.addEventListener("click", () => this.clickHandler(this));
         btn.addEventListener("mousedown", e => e.preventDefault()); // prevent taking focus
         btn.innerText = this.displayText;
         return btn;
+    }
+}
+
+class EditorCategory {
+    // btns should be an array of arrays of 3 strings representing the buttons
+    constructor(txt, btns) {
+        this.text = txt;
+        this.buttons = btns.map(x => new EditorButton(...x));
+    }
+
+    createElement() {
+        const cdiv = document.createElement("div");
+        cdiv.classList.add("mb-2")
+
+        const cpar = document.createElement("div");
+        cpar.classList.add("align-middle", "h-100", "d-inline-block", "m-1");
+        cpar.innerText = this.text;
+        cdiv.appendChild(cpar);
+
+        for (const btn of this.buttons) {
+            cdiv.appendChild(btn.createElement());
+        }
+        return cdiv;
     }
 }
 
@@ -36,21 +59,64 @@ function insertText(btn) {
 }
 
 const buttonList = [
-    ["\\frac{", "}{}", "frac"],
-    ["$", "$", "$$"],
-    ["^{", "}", "^"],
-    ["_{", "}", "_"],
-    ["\\cdot", "", "•"],
-    ["\\times", "", "⨯"],
-    ["^{\\circ}", "", "°"],
-    ["\\sqrt{", "}", "√x"],
-    ["\\approx", "", "≈"],
-    ["\\equiv", "", "≡"]
-].map(x => new EditorButton(...x));
+    new EditorCategory("General: ", [
+        ["\\frac{", "}{}", "frac"],
+        ["\\sum_{", "}^{}", "sum"],
+        ["$", "$", "$$"],
+        ["^{", "}", "^"],
+        ["_{", "}", "_"],
+        ["\\ans{", "}", "ans"]
+    ]),
+    new EditorCategory("Operators: ", [
+        ["\\cdot", "", "•"],
+        ["\\times", "", "⨯"],
+        ["\\pm", "", "±"],
+        ["\\sqrt{", "}", "√x"],
+        ["\\sqrt[", "]{}", "n√x"]
+    ]),
+    new EditorCategory("Equivalences: ", [
+        ["\\approx", "", "≈"],
+        ["\\equiv", "", "≡"],
+        ["\\propto", "", "∝"]
+    ]),
+    new EditorCategory("Inequalities: ", [
+        ["\\leq", "", "≤"],
+        ["\\geq", "", "≥"],
+        ["\\neq", "", "≠"],
+    ]),
+    new EditorCategory("Geometry: ", [
+        ["\\sim", "", "~"],
+        ["\\cong", "", "≅"],
+        ["\\angle", "", "∠"],
+        ["^{\\circ}", "", "°"],
+        ["\\triangle", "", "△"],
+        ["\\|", "", "∥"],
+        ["\\perp", "", "⟂"],
+        ["\\overline{", "}", "overline"]
+    ]),
+    new EditorCategory("Sets: ", [
+        ["\\in", "", "∈"],
+        ["\\ni", "", "∋"],
+        ["\\subset", "", "⊂"],
+        ["\\subseteq", "", "⊆"],
+        ["\\supset", "", "⊃"],
+        ["\\supseteq", "", "⊇"],
+        ["\\cup", "", "∪"],
+        ["\\cap", "", "∩"],
+        ["\\setminus", "", "\\"]
+    ]),
+    new EditorCategory("Arrows: ", [
+        ["\\to", "", "→"],
+        ["\\gets", "", "←"],
+        ["\\mapsto", "" ,"↦"],
+        ["\\Rightarrow", "", "⇒"],
+        ["\\Leftarrow", "", "⇐"]
+    ])
+];
 
 function buildEditor(par) {
-    for (const btn of buttonList) {
-        par.appendChild(btn.createElement());
+    for (const btnCategory of buttonList) {
+        par.appendChild(btnCategory.createElement());
     }
 }
 
@@ -59,7 +125,8 @@ function activate(el) {
 
     const ndiv = document.createElement("div");
     ndiv.id = `editor-${el.id}`;
-    ndiv.classList.add("editor");
+    ndiv.classList.add("editor", "bg-body", "border", "border-secondary", "rounded", "p-2");
+    ndiv.addEventListener("mousedown", e => e.preventDefault()); // prevent losing focus
     buildEditor(ndiv);
     el.after(ndiv);
 }
