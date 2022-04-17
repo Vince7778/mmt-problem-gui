@@ -14,7 +14,7 @@ class EditorButton {
         const btn = document.createElement("button");
         btn.classList.add("btn", `btn-${this.colorClass}`, "me-1", "d-inline");
         btn.type = "button";
-        btn.addEventListener("click", () => this.clickHandler(this.bf, this.af));
+        btn.addEventListener("click", () => this.clickHandler(this.beforeText, this.afterText));
         btn.addEventListener("mousedown", e => e.preventDefault()); // prevent taking focus
         btn.innerText = this.displayText;
         return btn;

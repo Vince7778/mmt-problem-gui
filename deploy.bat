@@ -1,10 +1,10 @@
-npm run build
+call npm run build
 cd dist
-git init
-git checkout -b main
-git add -A
-git commit -m "deploy"
+call git init
+call git checkout -b main
+call git add -A
+call git commit -m "deploy"
 
-git push -f git@github.com:Vince7778/mmt-problem-gui.git main:gh-pages
+call git push -f git@github.com:Vince7778/mmt-problem-gui.git main:gh-pages
 
-cd -
+cd ../
