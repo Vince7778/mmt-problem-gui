@@ -1,3 +1,4 @@
+import "./textEditor";
 
 let lastOutput = "";
 
@@ -127,7 +128,6 @@ function checkLatex(str, field) {
 
     // check between $$
     const dollarList = str.match(/[^$]*(\$|.$)/gm) || [];
-    console.log(dollarList);
     let curInd = 0; // current index in actual string
     let curLine = 1;
     let inDollars = false;
