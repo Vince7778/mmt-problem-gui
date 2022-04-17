@@ -1,0 +1,18 @@
+.hover-dropdown {
+    position: relative;
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.hover-dropdown-content {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    box-sizing: border-box;
+    bottom: 100%;
+    left: 0;
+}
+
+.hover-dropdown:hover .hover-dropdown-content {
+    display: block;
+}
