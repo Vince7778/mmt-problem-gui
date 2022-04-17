@@ -1,4 +1,4 @@
-import "./textEditor";
+import "./textEditor.js";
 
 let lastOutput = "";
 
