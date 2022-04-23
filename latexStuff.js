@@ -91,6 +91,23 @@ export function checkLatex(str, field) {
             })
         }
     }
+    
+    // check mismatched ()
+    const parenMis = checkMismatch(str, "(", ")", true);
+    if (parenMis.err !== 0) {
+        let retErr = {
+            error: "",
+            sev: "warn"
+        }
+        if (parenMis.err === 1) {
+            const subStr = str.substring(parenMis.ind-5, parenMis.ind+6);
+            retErr.error = `Mismatched ( around "${subStr}"`;
+        } else if (parenMis.err === -1) {
+            const subStr = str.substring(parenMis.ind-10, parenMis.ind);
+            retErr.error = `Mismatched ) after "${subStr}"`;
+        }
+        errorList.push(retErr);
+    }
 
     // check between $$
     const dollarList = str.match(/[^$]*(\$\$|\$|.$)/gm) || [];
@@ -101,8 +118,7 @@ export function checkLatex(str, field) {
         // check mismatching brackets
         const bracketList = [
             ['{', '}', "err"],
-            ['[', ']', "err"],
-            ['(', ')', "warn"]
+            ['[', ']', "err"]
         ];
         for (const [c1, c2, sev] of bracketList) {
             const res = checkMismatch(istr, c1, c2, true);
