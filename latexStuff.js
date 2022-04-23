@@ -171,33 +171,41 @@ export function displayLatex(str) {
                 try {
                     out += katex.renderToString(curToken, {
                         throwOnError: true,
-                        macros
+                        output: "html",
+                        macros: macros
                     });
                 } catch (err) {
                     errorList.push({
                         error: err.toString(),
-                        sev: "err"
+                        sev: "warn"
                     });
                     out += "ERROR";
                 }
+                insideMath = false;
                 curToken = "";
             } else {
                 insideMath = true;
                 curToken = "";
             }
+            i++;
         } else if (nxt(2) === "\n\n" && !esc) {
-            out += "<br>";
+            if (!insideMath) out += "<br>";
+            i += 2;
         } else if (str[i] === "\n" && !esc) {
-            out += "\t";
+            if (!insideMath) out += "\t";
+            i++;
         } else if (str[i] === "<") {
-            out += "&lt;";
+            if (!insideMath) out += "&lt;";
             curToken += "<";
+            i++;
         } else if (str[i] === ">") {
-            out += "&gt;";
+            if (!insideMath) out += "&gt;";
             curToken += ">";
+            i++;
         } else {
-            out += str[i];
+            if (!insideMath) out += str[i];
             curToken += str[i];
+            i++;
         }
         if (str[i] === "\\") {
             esc = true;
