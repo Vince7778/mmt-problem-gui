@@ -93,7 +93,7 @@ export function checkLatex(str, field) {
     }
 
     // check between $$
-    const dollarList = str.match(/[^$]*(\$|.$)/gm) || [];
+    const dollarList = str.match(/[^$]*(\$\$|\$|.$)/gm) || [];
     let curInd = 0; // current index in actual string
     curLine = 1;
     let inDollars = false;
@@ -156,6 +156,7 @@ export function displayLatex(str) {
     let insideMath = false;
     let esc = false;
     let errorList = [];
+    let displayMode = false;
 
     // helper function to get next characters
     function nxt(c) {
@@ -163,11 +164,47 @@ export function displayLatex(str) {
     }
     while (i < str.length) {
         // here goes!
-        if (str[i] === "$") {
+        if (nxt(2) === "$$" && !esc) {
+            if (insideMath) {
+                if (!displayMode) {
+                    errorList.push({
+                        error: "Mismatched display mode $$ vs inline mode $",
+                        sev: "err"
+                    });
+                }
+                try {
+                    out += katex.renderToString(curToken, {
+                        throwOnError: true,
+                        output: "html",
+                        displayMode: true,
+                        macros: macros
+                    });
+                } catch (err) {
+                    errorList.push({
+                        error: err.toString(),
+                        sev: "warn"
+                    });
+                    out += "ERROR";
+                }
+                insideMath = false;
+                curToken = "";
+            } else {
+                insideMath = true;
+                curToken = "";
+                displayMode = true;
+            }
+            i += 2;
+        } else if (str[i] === "$") {
             if (esc) {
                 out += "$";
                 curToken += "$";
             } else if (insideMath) {
+                if (displayMode) {
+                    errorList.push({
+                        error: "Mismatched display mode $$ vs inline mode $",
+                        sev: "err"
+                    });
+                }
                 try {
                     out += katex.renderToString(curToken, {
                         throwOnError: true,
@@ -186,6 +223,7 @@ export function displayLatex(str) {
             } else {
                 insideMath = true;
                 curToken = "";
+                displayMode = false;
             }
             i++;
         } else if (nxt(2) === "\n\n" && !esc) {
