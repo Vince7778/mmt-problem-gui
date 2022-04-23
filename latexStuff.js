@@ -37,13 +37,42 @@ export function checkLatex(str, field) {
 
     // check mismatching $
     let dollarCount = 0, skip = false;
+    let curLine = 1;
     for (let i = 0; i < str.length; i++) {
         if (skip) {
             skip = false;
             continue;
         }
-        if (str[i] === '\\') skip = true;
-        else if (str[i] === '$') dollarCount++;
+        switch (str[i]) {
+            case '\\':
+                if (str[i+1] === ' ' || !str[i+1]) {
+                    errorList.push({
+                        error: `Backslash not escaping anything. If you want a set difference, use \\setminus. If you want an actual backslash, use \\textbackslash{}. (line ${curLine})`,
+                        sev: "warn"
+                    });
+                }
+                skip = true;
+                break;
+            case '$':
+                dollarCount++;
+                break;
+            case '\n':
+                curLine++;
+                break;
+            case '#':
+            case '&':
+                errorList.push({
+                    error: `${str[i]} character used, make sure to use \\${str[i]} if you want it displayed as text (line ${curLine})`,
+                    sev: "warn"
+                });
+                break;
+            case '~':
+                errorList.push({
+                    error: `~ character used, make sure to use \\~{} if you want it displayed as text (line ${curLine})`,
+                    sev: "info"
+                });
+                break;
+        }
     }
     if (dollarCount % 2 === 1) {
         errorList.push({
@@ -65,7 +94,7 @@ export function checkLatex(str, field) {
     // check between $$
     const dollarList = str.match(/[^$]*(\$|.$)/gm) || [];
     let curInd = 0; // current index in actual string
-    let curLine = 1;
+    curLine = 1;
     let inDollars = false;
     for (const istr of dollarList) {
         // check mismatching brackets
