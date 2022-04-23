@@ -1,5 +1,5 @@
 import "./textEditor.js";
-import { checkLatex } from "./latexStuff.js";
+import { checkLatex, displayLatex } from "./latexStuff.js";
 
 let lastOutput = "";
 
@@ -30,6 +30,7 @@ function showError(str, sev) {
     document.getElementById("errors").appendChild(elem);
 
     document.getElementById("errors").classList.remove("d-none");
+    document.getElementById("outputDefault").classList.add("d-none");
 }
 
 function clearErrors() {
@@ -37,10 +38,25 @@ function clearErrors() {
     document.getElementById("errors").classList.add("d-none");
 }
 
+function showPreviews(previews) {
+    document.getElementById("previewWrapper").classList.remove("d-none");
+    for (const [i, field] of fieldList.entries()) {
+        document.getElementById(`${field}PreviewOut`).innerHTML = previews[i];
+    }
+}
+
+function clearPreviews() {
+    document.getElementById("previewWrapper").classList.add("d-none");
+    for (const field of fieldList) {
+        document.getElementById(`${field}PreviewOut`).innerHTML = "";
+    }
+}
+
 function showResult(str) {
     lastOutput = str;
     document.getElementById("compiledOutput").innerText = str;
     document.getElementById("outputSpace").classList.remove("d-none");
+    document.getElementById("outputDefault").classList.add("d-none");
 }
 
 document.getElementById("copyButton").addEventListener("click", ev => {
@@ -49,7 +65,10 @@ document.getElementById("copyButton").addEventListener("click", ev => {
 
 function resetDisplays() {
     document.getElementById("outputSpace").classList.add("d-none");
+    document.getElementById("previewWrapper").classList.add("d-none");
+    document.getElementById("outputDefault").classList.remove("d-none");
     clearErrors();
+    clearPreviews();
 }
 
 const formElement = document.getElementById("problemForm");
@@ -64,6 +83,8 @@ function getFormValues() {
     };
 }
 
+const fieldList = ["question", "comment", "answer", "solution"];
+
 function compileTemplate(vals) {
     let failed = false;
     if (vals.type === "") {
@@ -72,13 +93,26 @@ function compileTemplate(vals) {
     }
 
     // check latex of all fields
-    for (const field of ["question", "comment", "answer", "solution"]) {
+    for (const field of fieldList) {
         const respList = checkLatex(vals[field], field);
         for (const resp of respList) {
             showError(`In ${field}: ${resp.error}`, resp.sev);
             if (resp.sev === "err") failed = true;
         }
     }
+
+    if (failed) return false;
+
+    let previews = [];
+    for (const field of fieldList) {
+        const previewedObj = displayLatex(vals[field]);
+        for (const err of previewedObj.errorList) {
+            showError(`Preview error in ${field}: ${err.error}`, err.sev);
+            if (err.sev === "err") failed = true;
+        }
+        previews.push(previewedObj.out);
+    }
+
     if (failed) return false;
 
     const template = `\
@@ -104,6 +138,7 @@ ${vals.solution}
 \\problemend`;
 
     showResult(template);
+    showPreviews(previews);
     return true;
 }
 
