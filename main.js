@@ -30,6 +30,7 @@ function showError(str, sev) {
     document.getElementById("errors").appendChild(elem);
 
     document.getElementById("errors").classList.remove("d-none");
+    document.getElementById("outputDefault").classList.add("d-none");
 }
 
 function clearErrors() {
@@ -99,6 +100,8 @@ function compileTemplate(vals) {
             if (resp.sev === "err") failed = true;
         }
     }
+
+    if (failed) return false;
 
     let previews = [];
     for (const field of fieldList) {
