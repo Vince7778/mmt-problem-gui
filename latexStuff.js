@@ -173,6 +173,7 @@ export function displayLatex(str) {
     let esc = false;
     let errorList = [];
     let displayMode = false;
+    let dispStack = []; // stack of endings for italics, bolds, etc
 
     // helper function to get next characters
     function nxt(c) {
@@ -256,16 +257,49 @@ export function displayLatex(str) {
             if (!insideMath) out += "&gt;";
             curToken += ">";
             i++;
+        } else if (str[i] === "{" && !esc) {
+            if (!insideMath) out += "{";
+            curToken += "{";
+            dispStack.push("}");
+            i++;
+        } else if (str[i] === "}" && !esc) {
+            if (dispStack.length !== 0) {
+                const cc = dispStack.pop();
+                if (!insideMath) out += cc;
+                curToken += cc;
+            }
+            i++;
+        } else if (nxt(6) === "\\emph{" && !esc) {
+            if (!insideMath) out += "<i>";
+            curToken += "\\emph{";
+            dispStack.push("</i>");
+            i += 6;
+        } else if (nxt(8) === "\\textit{" && !esc) {
+            if (!insideMath) out += "<i>";
+            curToken += "\\textit{";
+            dispStack.push("</i>");
+            i += 8;
+        } else if (nxt(8) === "\\textbf{" && !esc) {
+            if (!insideMath) out += "<b>";
+            curToken += "\\textbf{";
+            dispStack.push("</b>");
+            i += 8;
+        } else if (nxt(11) === "\\underline{" && !esc) {
+            if (!insideMath) out += "<u>";
+            curToken += "\\underline{";
+            dispStack.push("</u>");
+            i += 11;
+        } else if (str[i] === "\\" && !str[i+1].match(/[a-zA-Z]/)) {
+            esc = true;
+            i++;
+            continue;
         } else {
             if (!insideMath) out += str[i];
             curToken += str[i];
             i++;
         }
-        if (str[i] === "\\") {
-            esc = true;
-        } else {
-            esc = false;
-        }
+
+        esc = false;
     }
 
     return {
