@@ -1,3 +1,4 @@
+import katex from "katex"
 
 // needs to open with c1 and close with c2
 // returns 0 if no mismatch, 1 if left open, -1 if premature close
@@ -140,4 +141,73 @@ export function checkLatex(str, field) {
     }
 
     return errorList;
+}
+
+const macros = {
+    "\\ans": "\\boxed{#1}"
+}
+
+// display the math mode parts of latex, rest as plaintext
+// returns { out: output, errorList: [errors] }
+export function displayLatex(str) {
+    let i = 0;
+    let out = "";
+    let curToken = "";
+    let insideMath = false;
+    let esc = false;
+    let errorList = [];
+
+    // helper function to get next characters
+    function nxt(c) {
+        return str.substring(i, i+c);
+    }
+    while (i < str.length) {
+        // here goes!
+        if (str[i] === "$") {
+            if (esc) {
+                out += "$";
+                curToken += "$";
+            } else if (insideMath) {
+                try {
+                    out += katex.renderToString(curToken, {
+                        throwOnError: true,
+                        macros
+                    });
+                } catch (err) {
+                    errorList.push({
+                        error: err.toString(),
+                        sev: "err"
+                    });
+                    out += "ERROR";
+                }
+                curToken = "";
+            } else {
+                insideMath = true;
+                curToken = "";
+            }
+        } else if (nxt(2) === "\n\n" && !esc) {
+            out += "<br>";
+        } else if (str[i] === "\n" && !esc) {
+            out += "\t";
+        } else if (str[i] === "<") {
+            out += "&lt;";
+            curToken += "<";
+        } else if (str[i] === ">") {
+            out += "&gt;";
+            curToken += ">";
+        } else {
+            out += str[i];
+            curToken += str[i];
+        }
+        if (str[i] === "\\") {
+            esc = true;
+        } else {
+            esc = false;
+        }
+    }
+
+    return {
+        out: out,
+        errorList: errorList
+    }
 }
