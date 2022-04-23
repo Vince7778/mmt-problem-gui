@@ -9,9 +9,10 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.3/dist/katex.min.css" integrity="sha384-KiWOvVjnN8qwAZbuQyWDIbfCLFhLXNETzBQjA/92pIowpC0d2O3nppDGQVgwd2nB" crossorigin="anonymous">
 
     <title>MMT Problem Compiler</title>
-  <script type="module" crossorigin src="/mmt-problem-gui/assets/index.a488ccbe.js"></script>
+  <script type="module" crossorigin src="/mmt-problem-gui/assets/index.1bda4240.js"></script>
   <link rel="stylesheet" href="/mmt-problem-gui/assets/index.5c266357.css">
 </head>
 
@@ -60,10 +61,46 @@
         </div>
         <div class="row mb-3">
             <div class="column">
-                <div class="mb-3 d-none" id="errors"></div>
-                <div class="d-none" id="outputSpace">
-                    <button id="copyButton" class="btn btn-success">Copy</button>
-                    <div class="font-monospace border rounded bg-light p-2 mt-1" id="compiledOutput"></div>
+                <ul class="nav nav-tabs mb-3" id="outputTab">
+                    <li class="nav-item">
+                        <button class="nav-link active" id="codeTab" data-bs-toggle="tab" data-bs-target="#codeSpace" type="button">Code</button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" id="previewTab" data-bs-toggle="tab" data-bs-target="#previewSpace" type="button">Preview</button>
+                    </li>
+                </ul>
+                <div id="outputDefault">
+                    <p>Compile your code to see the output here.</p>
+                </div>
+                <div class="tab-content" id="outputTabContent">
+                    <div class="tab-pane fade show active" id="codeSpace">
+                        <div class="mb-3 d-none" id="errors"></div>
+                        <div class="d-none" id="outputSpace">
+                            <button id="copyButton" class="btn btn-success">Copy</button>
+                            <div class="font-monospace border rounded bg-light p-2 mt-1" id="compiledOutput"></div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="previewSpace">
+                        <div class="d-none" id="previewWrapper">
+                            <p><i>This preview is probably inaccurate, but it should be close enough.</i></p>
+                            <div class="mb-2">
+                                <p>Question</p>
+                                <div class="border rounded p-2" id="questionPreviewOut"></div>
+                            </div>
+                            <div class="mb-2">
+                                <p>Comment</p>
+                                <div class="border rounded p-2" id="commentPreviewOut"></div>
+                            </div>
+                            <div class="mb-2">
+                                <p>Answer</p>
+                                <div class="border rounded p-2" id="answerPreviewOut"></div>
+                            </div>
+                            <div class="mb-2">
+                                <p>Solution</p>
+                                <div class="border rounded p-2" id="solutionPreviewOut"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
