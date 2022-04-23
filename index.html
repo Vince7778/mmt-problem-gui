@@ -66,6 +66,9 @@
                         <button class="nav-link" id="previewTab" data-bs-toggle="tab" data-bs-target="#previewSpace" type="button">Preview</button>
                     </li>
                 </ul>
+                <div id="outputDefault">
+                    <p>Compile your code to see the output here.</p>
+                </div>
                 <div class="tab-content" id="outputTabContent">
                     <div class="tab-pane fade show active" id="codeSpace">
                         <div class="mb-3 d-none" id="errors"></div>
@@ -73,12 +76,26 @@
                             <button id="copyButton" class="btn btn-success">Copy</button>
                             <div class="font-monospace border rounded bg-light p-2 mt-1" id="compiledOutput"></div>
                         </div>
-                        <div id="outputDefault">
-                            <p>Compile your code to see the output here.</p>
-                        </div>
                     </div>
                     <div class="tab-pane fade" id="previewSpace">
-                        <p>Placeholder</p>
+                        <div class="d-none" id="previewWrapper">
+                            <div class="mb-2">
+                                <p>Question</p>
+                                <div class="border rounded" id="questionPreviewOut"></div>
+                            </div>
+                            <div class="mb-2">
+                                <p>Comment</p>
+                                <div class="border rounded" id="commentPreviewOut"></div>
+                            </div>
+                            <div class="mb-2">
+                                <p>Answer</p>
+                                <div class="border rounded" id="answerPreviewOut"></div>
+                            </div>
+                            <div class="mb-2">
+                                <p>Solution</p>
+                                <div class="border rounded" id="solutionPreviewOut"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

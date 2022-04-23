@@ -41,6 +41,8 @@ function showResult(str) {
     lastOutput = str;
     document.getElementById("compiledOutput").innerText = str;
     document.getElementById("outputSpace").classList.remove("d-none");
+    document.getElementById("previewWrapper").classList.remove("d-none");
+    document.getElementById("outputDefault").classList.add("d-none");
 }
 
 document.getElementById("copyButton").addEventListener("click", ev => {
@@ -49,6 +51,8 @@ document.getElementById("copyButton").addEventListener("click", ev => {
 
 function resetDisplays() {
     document.getElementById("outputSpace").classList.add("d-none");
+    document.getElementById("previewWrapper").classList.add("d-none");
+    document.getElementById("outputDefault").classList.remove("d-none");
     clearErrors();
 }
 
